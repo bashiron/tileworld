@@ -1,5 +1,9 @@
 from weapon import Weapon
+from physical import Physical
 
+from zope.interface import implementer
+
+@implementer(Physical)
 class Player:
     def __init__(self, name):
         self.name = name

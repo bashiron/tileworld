@@ -14,6 +14,11 @@ class TestGame(TestCase):
         game.tick()
         assert True
 
+    def test_something(self):
+        p_bashiron = Player('Bashiron')
+        p_bashiron.greet()
+        p_bashiron.lol()
+
     @classmethod
     def setUpClass(cls):
         pass
