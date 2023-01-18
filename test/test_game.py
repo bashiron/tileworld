@@ -9,7 +9,7 @@ class TestGame(TestCase):
 
     def test_idle(self):
         p_bashiron = Player('Bashiron')
-        w_lordran = World()
+        w_lordran = World(10, 10)
         game = Game(p_bashiron, w_lordran)
         game.tick()
         assert True

@@ -9,5 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="youtubePlaylistSavior" />
+    <orderEntry type="module" module-name="Riposte" />
+    <orderEntry type="module" module-name="snippets" />
   </component>
 </module>

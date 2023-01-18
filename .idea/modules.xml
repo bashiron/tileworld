@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Riposte/.idea/Riposte.iml" filepath="$PROJECT_DIR$/../Riposte/.idea/Riposte.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../practice_projects/snippets/.idea/snippets.iml" filepath="$PROJECT_DIR$/../practice_projects/snippets/.idea/snippets.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/tileworld.iml" filepath="$PROJECT_DIR$/.idea/tileworld.iml" />
       <module fileurl="file://$PROJECT_DIR$/../youtubePlaylistSavior/.idea/youtubePlaylistSavior.iml" filepath="$PROJECT_DIR$/../youtubePlaylistSavior/.idea/youtubePlaylistSavior.iml" />
     </modules>
