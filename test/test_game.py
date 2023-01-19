@@ -1,16 +1,13 @@
-from game import Game
-from player import Player
-from world import World
-from weapon import Weapon
-
 from unittest import TestCase
+
+from game import *
 
 class TestGame(TestCase):
 
     def test_idle(self):
         p_bashiron = Player('Bashiron')
-        w_lordran = World(10, 10)
-        game = Game(p_bashiron, w_lordran)
+        g_lordran = Grid(10, 10)
+        game = Game(p_bashiron, g_lordran)
         game.tick()
         assert True
 
