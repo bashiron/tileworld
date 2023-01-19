@@ -1,9 +1,14 @@
+from abc import ABC
 from collections.abc import Callable
 from zope.interface import implementer, Interface, Attribute
 from functools import reduce
 from more_itertools import map_if
 
+density = (0, 4)   # defines min and max amount of Items per Tile in the Grid
+
 class Game:
+    """Manager of the topmost game mechanics and execution flow.
+    """
     def __init__(self, player, world):
         self.player = player
         self.world = world
@@ -22,21 +27,76 @@ class Physical(Interface):
 
 
 @implementer(Physical)
+class Item(ABC):
+    """Abstract class representing items. Items have the property of being able to be possesed by a player.
+    """
+
+    name: str
+    """Name."""
+    weight: int
+    """Weight."""
+
+    def __init__(self, name, weight):
+        self.name = name
+        self.weight = weight
+
+
+class Weapon(Item):
+    """Reusable item with the main purpose of dealing HP damage.
+    """
+
+    dmg: dict
+    """Damage done by weapon."""
+    crit: int
+    """Critical chance % out of 100."""
+    max_cond: int
+    """Total, maximum and starting condition."""
+    cond: int
+    """Current condition."""
+
+    def __init__(self, name, dmg, crit, cond, weight):
+        super().__init__(name, weight)
+        self.dmg = dmg
+        self.crit = crit
+        self.max_cond = cond
+        self.cond = self.max_cond
+
+
+class Inventory:
+    """Item container attached to Player.
+    """
+
+    items: list[Item]
+    """Inventory contents."""
+
+    def __init__(self):
+        self.items = []
+
+    def add_item(self, item):
+        self.items.append(item)
+
+
+@implementer(Physical)
 class Player:
+
+    name: str
+    """Player name."""
+    hp: int
+    """Health points."""
+    sp: int
+    """Stamina points."""
+    weapon: Weapon
+    """Currently equipped weapon."""
+    inv: Inventory
+    """Inventory, contains items."""
+
     def __init__(self, name):
+        from instances.weapons import unarmed
         self.name = name
         self.hp = 100   # health points
         self.sp = 100   # stamina points
-        self.weapon = Weapon(
-            'Unarmed',
-            {
-                'phys': 10,
-                'magc': 0,
-                'lgtn': 0,
-                'fire': 0
-            },
-            999,
-            15)
+        self.weapon = unarmed
+        self.inv = Inventory()
 
     def tick(self):
         pass
@@ -46,6 +106,47 @@ class Player:
 
     def pick_up(self):
         pass
+
+    def drop(self, item):
+        """Drop item to the ground.
+        """
+        # remove item from inventory
+        # add it to current Tile's load
+        pass
+
+
+class Enemy:
+
+    name: str
+    """Name."""
+    hp: int
+    """Health points."""
+    dmg: dict
+    """Damage done by enemy."""
+    drops: list[Item]
+    """Items dropped on enemy defeat."""
+
+    def __init__(self, name, hp, dmg, drops):
+        self.name = name
+        self.hp = hp
+        self.dmg = dmg
+        self.drops = drops
+
+
+class Consumable(Item):
+    """One-use item that causes an effect on Player and/or Enemy.
+    """
+
+    p_effect: Callable[[Player], None]
+    """Effect on Player on use."""
+    e_effect: Callable[[Enemy], None]
+    """Effect on Enemy on use."""
+
+    def __init__(self, name, p_effect, e_effect, weight):
+        super().__init__(name, weight)
+        self.p_effect = p_effect
+        self.e_effect = e_effect
+
 
 class Trait:
     """Bonuses for a character, a specialization
@@ -70,6 +171,9 @@ class Coord:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def __eq__(self, other):
+        return other.x == self.x and other.y == self.y
 
 class Tile:
     """Minimal atomic space in the game `World`.
@@ -175,6 +279,21 @@ class Grid:
         # or return a dictionary where keys are the cardinal points and values their loads
         pass
 
+    def populate(self):
+        from utils import take_rand
+        from instances.weapons import export as wps
+        from instances.consumables import export as cons
+
+        for tile in self.navigate():
+            stuff = take_rand(wps + cons, density[0], density[1])
+            tile.load.extend(stuff)
+
+    def navigate(self):
+        for row in self.matrix:
+            for tile in row:
+                yield tile
+
+
 def build_row(length, pos):
     """Build a row of the specified length.
 
@@ -191,13 +310,3 @@ def build_row(length, pos):
         Row with Tiles.
     """
     return [Tile(Coord(n, pos)) for n in range(length)]
-
-
-class Weapon:
-
-    def __init__(self, name, dmg, crit, cond):
-        self.dmg = dmg    # damage values
-        self.crit = crit    # critical chance % out of 100
-        self.init_cond = cond   # total condition
-        self.cond = self.init_cond  # current condition
-

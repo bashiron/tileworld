@@ -1,0 +1,2 @@
+def inert(entity):
+    pass
