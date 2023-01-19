@@ -7,6 +7,6 @@ setup(
     py_modules=[],
     install_requires=[
         'zope.interface==5.5.2',
-        'numpy==1.24.1'
+        'more-itertools==9.0.0'
     ]
 )
