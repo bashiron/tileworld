@@ -9,9 +9,9 @@ density = (0, 4)   # defines min and max amount of Items per Tile in the Grid
 class Game:
     """Manager of the topmost game mechanics and execution flow.
     """
-    def __init__(self, player, world):
+    def __init__(self, player, grid):
         self.player = player
-        self.world = world
+        self.world = grid
         self.tick = 0
 
     def tick(self):
@@ -39,6 +39,9 @@ class Item(ABC):
     def __init__(self, name, weight):
         self.name = name
         self.weight = weight
+
+    def __str__(self):
+        return self.name
 
 
 class Weapon(Item):
@@ -70,7 +73,8 @@ class Inventory:
     """Inventory contents."""
 
     def __init__(self):
-        self.items = []
+        from instances.consumables import estus
+        self.items = [estus]
 
     def add_item(self, item):
         self.items.append(item)
@@ -100,6 +104,17 @@ class Player:
 
     def tick(self):
         pass
+
+    def use(self, item):
+        """Use consumable item.
+
+        Parameters
+        -----
+        item : `Consumable`
+            Consumable item to use.
+        """
+        item.p_effect(self)
+        item.e_effect(...)  # TODO how do i communicate with the Grid? should i instead trigger the usage from a higher scope?
 
     def attack(self, enemy):
         pass
@@ -173,7 +188,10 @@ class Coord:
         self.y = y
 
     def __eq__(self, other):
-        return other.x == self.x and other.y == self.y
+        if isinstance(other, Coord):
+            return other.x == self.x and other.y == self.y
+        else:
+            return False
 
 class Tile:
     """Minimal atomic space in the game `World`.
@@ -271,6 +289,12 @@ class Grid:
         # when a character moves (any of 4 directions) their coord attribute should change and also the Grid has to
         # remove it from the previous Tile's "load" and put it in the new Tile's "load"
         pass
+
+    def oponent(self):
+        """Get the player character's current enemy, the one in the same Tile.
+        """
+        # TODO
+        return ...
 
     def surroundings(self, char):
         """Return what is contained in the four (non-diagonally) adjacent Tiles.
